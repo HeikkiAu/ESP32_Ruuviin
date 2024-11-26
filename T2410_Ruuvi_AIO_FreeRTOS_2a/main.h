@@ -1,16 +1,18 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-/// SSID Definitions
-#define   ANDROID
-//#define   H_MOKKULA
-//#define   PIRPANA
-//#define   LILLA_ASTRID
+// SSID Definitions
+#define TPPORTIMO
+// #define  ASUS_4GN16
+// #define  IPHONE
+// #define  ANDROID
+// #define  H_MOKKULA
 
-#define CAPTION_LEN               40      ///< Length of value name
+#define CAPTION_LEN               30 //40      ///< Length of value name
 #define MAC_ADDR_LEN              18      ///< Length of the BLE MAC address string
 #define BLE_VERBOSE               true
-#define BLE_SCAN_TIME_SEC         5
+#define TARKISTA                  false
+#define BLE_SCAN_TIME_SEC         10
 
 // Adafruit IO
 #define AIO_SERVER      "io.adafruit.com"
@@ -19,10 +21,10 @@
 #define AIO_KEY         IO_KEY
 #define AIO_PUBLISH_INTERVAL_ms  60000
 
-#define PIN_LED_WHITE     33
-#define PIN_LED_YELLOW    25
-#define PIN_LED_BLUE      26 
-#define PIN_LED_RED       27
+#define PIN_LED_WHITE     33    // wifi_task.cpp output
+#define PIN_LED_YELLOW    25    // mqtt_task.cpp
+#define PIN_LED_BLUE      26    // ruuvi_ble.cpp BT
+#define PIN_LED_RED       27    // wifi - error
 
 typedef struct
 {

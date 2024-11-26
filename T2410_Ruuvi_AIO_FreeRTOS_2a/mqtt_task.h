@@ -5,7 +5,7 @@
 #include "main.h"
 #include "ruuvi_tag.h"
 
-#define AIO_PUBL_NBR_OF     5
+#define AIO_PUBL_NBR_OF     9 //julkaitavien mittausten # 
 
 typedef enum
 {
@@ -21,7 +21,7 @@ typedef enum
 typedef enum
 {
     VALUE_TYPE_UNDEFINED = 0,
-    VALUE_TYPE_FLOAT,
+    VALUE_TYPE_FLOAT
 } value_type_et;
 
 

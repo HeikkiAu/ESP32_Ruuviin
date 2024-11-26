@@ -7,7 +7,7 @@ const char* password = WIFI_PASS;            //Main Router Password
 
 WiFiClient client;
 extern main_ctrl_st main_ctrl;
-extern SemaphoreHandle_t sema_radio;
+// extern SemaphoreHandle_t sema_radio;
 
 
 void wifi_task_code( void *pvParameters ){

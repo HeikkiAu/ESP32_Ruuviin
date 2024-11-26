@@ -44,9 +44,14 @@ int8_t RuuviTag::add(const char *mac_address, const char *loc)
         ruuvi[_active_indx].mac_addr = String(mac_address);
         strncpy(ruuvi[_active_indx].location, loc, RUUVI_LOCATION_LEN);
     }
+    if ( TARKISTA )
+    {
+    Serial.println(" - - -  ruuvitag. cpp  - - - - - - - - - - - - -");
     Serial.printf("add:  %d = %d  ",nbr_of, _active_indx);
     Serial.println(mac_address);
     Serial.println(ruuvi[_active_indx].mac_addr);
+    Serial.println("\n - - -  ruuvitag. cpp  - - - - - - - - - - - - -");
+     }   
     return  _active_indx;
 }
 
@@ -69,8 +74,8 @@ uint8_t RuuviTag::get_index(String mac_addr)
     uint8_t indx = 0;
     while((indx < nbr_of) && (ret_indx == NOT_A_RUUVI))
     {
-        //Serial.printf("?? %d: ",indx);
-        //Serial.print( mac_addr ); Serial.print(" == "); Serial.println(ruuvi[indx].mac_addr);
+        Serial.printf("?? %d: ",indx);
+        Serial.print( mac_addr ); Serial.print(" == "); Serial.println(ruuvi[indx].mac_addr);
         if (mac_addr == ruuvi[indx].mac_addr)  ret_indx = indx;
         indx++;
     }
@@ -91,6 +96,9 @@ ruuvi_tag_st *RuuviTag::get_data_ptr(String mac_addr)
     if (tag_indx <= nbr_of) return (&ruuvi[tag_indx]);
     else return (NULL);
 }
+
+
+// ---------------------------------------------------------
 
 bool RuuviTag::is_a_defined_ruuvi(String mac_addr)
 {
@@ -119,6 +127,13 @@ float RuuviTag::get_humidity(uint8_t indx)
 {
     return ruuvi[indx].humidity;
 }
+
+// haetaan myös ilmanpainetta 
+float  RuuviTag::get_pressure(uint8_t indx)
+{
+    return ((ruuvi[indx].pressure)/100+500);
+}
+
 
 float RuuviTag::get_rssi(uint8_t indx)
 {
@@ -149,6 +164,9 @@ void RuuviTag::decode_raw_data(String mac_addr, String raw_data, int rssi)
         if(ruuvi[indx].mac_addr.indexOf(mac_addr)  >= 0 )
         {
             ruuvi[indx].rssi = rssi;
+
+
+            /*  nmero 3 on vanha protokolla ---------------------------------------------*/
             if(raw_data.substring(4, 6) == "03")
             {   
                 ruuvi[indx].temperature = hexadecimalToDecimal(raw_data.substring(8, 10));
@@ -176,20 +194,54 @@ void RuuviTag::decode_raw_data(String mac_addr, String raw_data, int rssi)
                 //ruuvi[indx].measurement = hexadecimalToDecimal(raw_data.substring(36, 40));
                 ruuvi[indx].updated = true;
             }
-            if(raw_data.substring(4, 6) == "05")
+           /* ----------------------------------------------------------*/
+
+            if(raw_data.substring(4, 6) == "05")  // ruuvin protokolla 5
             {
                 ruuvi[indx].temperature = hexadecimalToDecimal(raw_data.substring(6, 10));
-                ruuvi[indx].temp_fp = (float) ruuvi[indx].temperature * 0.005;
-                ruuvi[indx].humidity = hexadecimalToDecimal(raw_data.substring(10, 14)) *0.000025;
-                uint16_t u16 = hexadecimalToDecimal(raw_data.substring(18, 20));
-                ruuvi[indx].voltage = float(u16 >> 5) +1.6;
-                ruuvi[indx].updated = true;        
+                ruuvi[indx].temp_fp = float (ruuvi[indx].temperature * 0.005 );
+                ruuvi[indx].humidity = float(hexadecimalToDecimal(raw_data.substring(10, 14)) *0.0025);
+
+
+                uint16_t u16 = hexadecimalToDecimal(raw_data.substring(30, 34));
+                ruuvi[indx].voltage = float((u16 >> 5) +1600 ) *0.001; // volteiksi 20211113
+                
+
+
+
+
+                //uint16_t pres = hexadecimalToDecimal(raw_data.substring(14,18));
+                //ruuvi[indx].pressure = (pres/100 + 500 );
+
+                 // ruuvi[indx].pressure = (hexadecimalToDecimal(raw_data.substring(14,18))/100 + 500 );
+                 
+                //Serial.printf("Pressure  suoraan: %d  \n", ruuvi[indx].pressure);   
+                // ruuvi[indx].pressure = float(ruuvi[indx].pressure  );
+                //Serial.printf("Pressure: %f  \n", ruuvi[indx].pressure);
+
+           
+
+
+
+
+                      /*  ilmanpaine  */
+                uint16_t pres = hexadecimalToDecimal(raw_data.substring(14,18));
+                ruuvi[indx].pressure = float (pres/100 + 500 );
+
+                // ruuvi[indx].pressure = (hexadecimalToDecimal(raw_data.substring(14,18))/100 + 500 );
+                if ( TARKISTA ) 
+                { 
+                Serial.printf("Pressure  suoraan: %d     %f\n", ruuvi[indx].pressure , ruuvi[indx].pressure);   
+                // ruuvi[indx].pressure = float(ruuvi[indx].pressure  );
+                Serial.printf("TEMP  %f  float %d int \n"), ruuvi[indx].temp_fp,ruuvi[indx].temp_fp;
+                 }
+                  ruuvi[indx].updated = true;  
+
+
             }
 
         
         }
-        // Serial.printf("%20s ",ruuvi[indx].location);
-        // Serial.printf("Temperature: %f ", ruuvi[indx].temp_fp);
-        // Serial.printf("Humidity: %f\n", ruuvi[indx].humidity);
+ 
     }
 }
