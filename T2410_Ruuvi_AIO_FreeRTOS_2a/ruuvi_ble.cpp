@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -10,7 +9,7 @@
 
 extern main_ctrl_st main_ctrl;
 extern RuuviTag ruuvi_tag;
-// extern SemaphoreHandle_t sema_radio;
+extern SemaphoreHandle_t sema_radio;
 
 
 BLEDevice     ble_device;
@@ -59,7 +58,9 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
 
 void ruuvi_ble_initialize(void)
 {
+    //BLEDevice::init("");
     ble_device.init("");
+    //pBLEScan = BLEDevice::getScan();  //create new scan
     pBLEScan = ble_device.getScan();  //create new scan
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setActiveScan(true);  //active scan uses more power, but get results faster
